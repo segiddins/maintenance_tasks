@@ -38,7 +38,9 @@ module MaintenanceTasks
       when :no_collection
         enumerator_builder.build_once_enumerator(cursor: nil)
       when ActiveRecord::Relation
-        enumerator_builder.active_record_on_records(collection, cursor: cursor, columns: @task.cursor_columns)
+        options = { cursor: cursor, columns: @task.cursor_columns }
+        options[:batch_size] = @task.enumerator_relation_limit if @task.enumerator_relation_limit
+        enumerator_builder.active_record_on_records(collection, **options)
       when ActiveRecord::Batches::BatchEnumerator
         if collection.start || collection.finish
           raise ArgumentError, <<~MSG.squish

@@ -18,6 +18,8 @@ module MaintenanceTasks
     # @api private
     class_attribute :throttle_conditions, default: []
 
+    class_attribute :enumerator_relation_limit
+
     # @api private
     class_attribute :collection_builder_strategy, default: NullCollectionBuilder.new
 
@@ -135,6 +137,10 @@ module MaintenanceTasks
         backoff_as_proc = -> { backoff } unless backoff.respond_to?(:call)
 
         self.throttle_conditions += [{ throttle_on: condition, backoff: backoff_as_proc }]
+      end
+
+      def collection_limit(limit)
+        self.enumerator_relation_limit = limit
       end
 
       # Initialize a callback to run after the task starts.
